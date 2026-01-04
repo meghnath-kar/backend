@@ -4,6 +4,8 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const connectDB = require('./database/connection');
 const courseRoutes = require('./routes/courseRoutes');
+const userRoutes = require('./routes/userRoutes');
+const filterRoutes = require('./routes/filterRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5002;
@@ -18,6 +20,8 @@ connectDB();
 
 // Routes
 app.use('/api/courses', courseRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/filters', filterRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {

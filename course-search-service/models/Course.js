@@ -13,35 +13,27 @@ const courseSchema = new mongoose.Schema(
     },
     instructor: {
       type: String,
+      ref: 'User',
       required: true,
     },
     category: {
       type: String,
+      ref: 'Category',
       required: true,
     },
-    price: {
-      type: Number,
-      required: true,
-      min: 0,
+    technology: {
+      type: [String],
+      ref: 'Technology',
+      required: false
     },
     duration: {
-      type: String,
+      type: Number,
       required: true,
     },
     level: {
       type: String,
       enum: ['Beginner', 'Intermediate', 'Advanced'],
       default: 'Beginner',
-    },
-    enrollmentCount: {
-      type: Number,
-      default: 0,
-    },
-    rating: {
-      type: Number,
-      default: 0,
-      min: 0,
-      max: 5,
     },
     isActive: {
       type: Boolean,
@@ -50,6 +42,13 @@ const courseSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
+    versionKey: false,
+    toJSON: {
+      transform: function (doc, ret) {
+        delete ret.__v;
+        return ret;
+      }
+    }
   }
 );
 
