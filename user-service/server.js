@@ -3,11 +3,11 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const connectDB = require('./database/connection');
-const courseRoutes = require('./routes/courseRoutes');
-const filterRoutes = require('./routes/filterRoutes');
+const authRoutes = require('./routes/authRoutes');
+const userRoutes = require('./routes/userRoutes');
 
 const app = express();
-const PORT = process.env.PORT || 5002;
+const PORT = process.env.PORT || 5003;
 
 // Middleware
 app.use(cors());
@@ -18,12 +18,12 @@ app.use(bodyParser.urlencoded({ extended: true }));
 connectDB();
 
 // Routes
-app.use('/api/courses', courseRoutes);
-app.use('/api/filters', filterRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
-  res.status(200).json({ status: 'Course Search Service is running' });
+  res.status(200).json({ status: 'User Service is running' });
 });
 
 // Error handling middleware
@@ -33,5 +33,7 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Course Search Service running on port ${PORT}`);
+  console.log(`User Service running on port ${PORT}`);
 });
+
+module.exports = app;

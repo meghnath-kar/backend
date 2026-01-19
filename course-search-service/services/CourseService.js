@@ -7,7 +7,6 @@ class CourseService {
     async createCourse(courseData) {
         const { title, description, instructor, category, duration, level, technology } = courseData;
 
-        // Validation
         if (!title || !description || !instructor || !category || !duration || !technology) {
             throw new Error('Missing required fields');
         }
@@ -33,23 +32,22 @@ class CourseService {
         return savedCourse;
     }
 
-    async getAllCourses(filters = {}) {
-        const { category, level, duration, search, technology } = filters;
+    async getFilteredCourses(filters = {}) {
+        const { category, level, duration, search, technology, page = 1, limit = 3 } = filters;
         let query = {
             isActive: true
         };
 
-        // Build array to hold $and conditions when multiple $or conditions exist
         let andConditions = [];
 
-        if (search) {
-            andConditions.push({
-                $or: [
-                    { title: { $regex: search, $options: 'i' } },
-                    { description: { $regex: search, $options: 'i' } }
-                ]
-            });
-        }
+        // if (search) {
+        //     andConditions.push({
+        //         $or: [
+        //             { title: { $regex: search, $options: 'i' } },
+        //             { description: { $regex: search, $options: 'i' } }
+        //         ]
+        //     });
+        // }
 
         if (duration?.length) {
             const durationConditions = CourseService.buildDurationQuery(duration);
@@ -58,11 +56,9 @@ class CourseService {
             }
         }
 
-        // If we have multiple $or conditions, wrap them in $and
         if (andConditions.length > 1) {
             query.$and = andConditions;
         } else if (andConditions.length === 1) {
-            // If only one $or condition, add it directly
             Object.assign(query, andConditions[0]);
         }
 
@@ -78,17 +74,47 @@ class CourseService {
             query.technology = { $in: Array.isArray(technology) ? technology : [technology] };
         }
 
-        console.log('Constructed Course Query:', JSON.stringify(query, null, 2));
-        let courseQuery = Course.find(query)
+        
+        const totalCourses = await Course.countDocuments(query);
+
+        // Calculate pagination values
+        const pageNumber = Number(page);
+        const pageSize = Number(limit);
+        const totalPages = Math.ceil(totalCourses / pageSize);
+        const skip = (pageNumber - 1) * pageSize;
+
+        const courses = await Course.find(query)
             .populate('category', 'name')
             .populate('instructor', 'fullName email')
-            .populate('technology', 'label');
+            .populate('technology', 'label')
+            .sort({ createdAt: 1 })
+            .skip(skip)
+            .limit(pageSize)
+            .exec();
 
-        // Apply sorting
-        courseQuery = courseQuery.sort({ createdAt: -1 });
+        return {
+            count: totalCourses,
+            courses: courses,
+            totalPages: totalPages,
+            currentPage: pageNumber,
+            pageSize: pageSize,
+            hasNextPage: pageNumber < totalPages,
+            hasPrevPage: pageNumber > 1
+        };
+    }
 
-        const courses = await courseQuery.exec();
-        return courses;
+    async getCourseById(id) {
+        if (!id) {
+            throw new Error('Missing required fields');
+        }
+        
+        const course = await Course.findById(id)
+            .populate('category', 'name')
+            .populate('instructor', 'fullName email')
+            .populate('technology', 'label')
+            .exec();
+
+        return course;
     }
 
     static buildDurationQuery(durationArray) {

@@ -7,6 +7,12 @@ const courseSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+    slug: {
+      type: String,
+      unique: true,
+      lowercase: true,
+      trim: true,
+    },
     description: {
       type: String,
       required: true,
@@ -54,5 +60,18 @@ const courseSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+// Generate slug from title before saving
+courseSchema.pre('save', function(next) {
+  if (this.isModified('title') || !this.slug) {
+    this.slug = this.title
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .trim();
+  }
+  next();
+});
 
 module.exports = mongoose.model('Course', courseSchema);
