@@ -14,7 +14,6 @@ const authMiddleware = async (req, res, next) => {
     const token = authHeader.split(' ')[1];
     const user = await AuthService.verifyToken(token);
 
-    // Attach user to request
     req.user = {
       id: user._id,
       email: user.email,

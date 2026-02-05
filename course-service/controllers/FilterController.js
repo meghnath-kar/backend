@@ -8,7 +8,6 @@ class FilterController {
     async getAllFilters(req, res) {
         try {
             const filters = await this.filterService.getAllFilters();
-
             res.status(200).json({
                 success: true,
                 data: filters

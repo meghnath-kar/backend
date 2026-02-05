@@ -33,21 +33,21 @@ class CourseService {
     }
 
     async getFilteredCourses(filters = {}) {
-        const { category, level, duration, search, technology, page = 1, limit = 3 } = filters;
+        const { category, level, duration, search, technology, page = 1, limit = 6 } = filters;
         let query = {
             isActive: true
         };
 
         let andConditions = [];
 
-        // if (search) {
-        //     andConditions.push({
-        //         $or: [
-        //             { title: { $regex: search, $options: 'i' } },
-        //             { description: { $regex: search, $options: 'i' } }
-        //         ]
-        //     });
-        // }
+        if (search) {
+            andConditions.push({
+                $or: [
+                    { title: { $regex: search, $options: 'i' } },
+                    { description: { $regex: search, $options: 'i' } }
+                ]
+            });
+        }
 
         if (duration?.length) {
             const durationConditions = CourseService.buildDurationQuery(duration);
@@ -77,7 +77,6 @@ class CourseService {
         
         const totalCourses = await Course.countDocuments(query);
 
-        // Calculate pagination values
         const pageNumber = Number(page);
         const pageSize = Number(limit);
         const totalPages = Math.ceil(totalCourses / pageSize);

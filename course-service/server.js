@@ -21,17 +21,6 @@ connectDB();
 app.use('/api/courses', courseRoutes);
 app.use('/api/filters', filterRoutes);
 
-// Health check endpoint
-app.get('/health', (req, res) => {
-  res.status(200).json({ status: 'Course Search Service is running' });
-});
-
-// Error handling middleware
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ error: 'Something went wrong!' });
-});
-
 app.listen(PORT, () => {
   console.log(`Course Search Service running on port ${PORT}`);
 });

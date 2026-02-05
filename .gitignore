@@ -1,4 +1,8 @@
 # Node modules
-node_modules/
-package-lock.json
-yarn.lock
+course-service/node_modules/
+course-service/package-lock.json
+course-service/yarn.lock
+
+user-service/node_modules/
+user-service/package-lock.json
+user-service/yarn.lock

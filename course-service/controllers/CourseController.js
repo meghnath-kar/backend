@@ -8,7 +8,6 @@ class CourseController {
     async createCourse(req, res) {
         try {
             const savedCourse = await this.courseService.createCourse(req.body);
-
             res.status(201).json({
                 message: 'Course added successfully',
                 course: savedCourse,
@@ -25,7 +24,6 @@ class CourseController {
     async getFilteredCourses(req, res) {
         try {
             const courses = await this.courseService.getFilteredCourses(req.body);
-
             res.status(200).json({
                 ...courses
             });

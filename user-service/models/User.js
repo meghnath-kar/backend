@@ -28,6 +28,7 @@ const userSchema = new mongoose.Schema(
       type: Number,
       required: true,
       min: 18,
+      default: 20,
     },
     password: {
       type: String,
@@ -62,7 +63,6 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-// Hash password before saving
 userSchema.pre('save', async function () {
   if (!this.isModified('password')) {
     return;
@@ -75,7 +75,6 @@ userSchema.pre('save', async function () {
   }
 });
 
-// Method to compare password for login
 userSchema.methods.comparePassword = async function (candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
 };
